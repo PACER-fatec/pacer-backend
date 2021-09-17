@@ -1,15 +1,17 @@
 from flask import Flask, request
 from flask_cors import cross_origin
+from datetime import datetime
+import json
 
 app = Flask(__name__)
 
-@app.route("/pacer")
+@app.route("/")
 def hello():
     return "Pepino Denovo!"
 
-@app.route("/pacer/test", methods = ['POST'])
+@app.route("/pacer", methods = ['POST'])
 @cross_origin()
 def test():
-    campo1 = request.form.get("campo1")
-    campo2 = request.form.get("campo2")
-    return f"O primeiro input foi: {campo1} e o segundo input foi: {campo2}"
+    requestList = request.form
+    fullJson = json.dumps(request.form)
+    return f"inputs: {fullJson}"
