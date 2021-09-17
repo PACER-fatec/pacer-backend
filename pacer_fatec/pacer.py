@@ -1,7 +1,9 @@
 from flask import Flask, request
 from flask_cors import cross_origin
+from flask_pymongo import pymongo
 from datetime import datetime
 import json
+import mdb_connection as mdb
 
 app = Flask(__name__)
 
@@ -13,5 +15,9 @@ def hello():
 @cross_origin()
 def test():
     requestList = request.form
-    fullJson = json.dumps(request.form)
-    return f"inputs: {fullJson}"
+    requestList = requestList.to_dict()
+    requestList['data-avaliacao'] = str(datetime.now().strftime('%d/%m/%y %H:%M'))
+    fullJson = json.loads(json.dumps(requestList))
+    mdb.db.fatec.insert_one(fullJson)
+    
+    return "Avaliação enviada! Obrigado."
