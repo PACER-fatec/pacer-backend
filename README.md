@@ -14,3 +14,8 @@ set FLASK_APP=pacer.py
 
 flask run
 ```
+
+### Dependência necessária
+```
+python -m pip install "pymongo[srv]"
+```
