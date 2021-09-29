@@ -4,6 +4,10 @@ from flask_pymongo import pymongo
 from datetime import datetime
 import json
 import mdb_connection as mdb
+import importDb as imdb
+
+#Importar alunos do arquivo /resources/alunos.csv
+imdb.importAlunos()
 
 app = Flask(__name__)
 
