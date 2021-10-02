@@ -7,7 +7,8 @@ import mdb_connection as mdb
 import importDb as imdb
 
 #Importar alunos do arquivo /resources/alunos.csv
-imdb.importAlunos()
+#DESCOMENTE A LINHA 11 SE A TABELA ALUNOS ESTIVER VAZIA. COMENTE PARA NÃO TER ERRO DE DUPLICIDADE.
+#imdb.importAlunos()
 
 app = Flask(__name__)
 
@@ -17,7 +18,7 @@ def hello():
 
 @app.route("/pacer", methods = ['POST'])
 @cross_origin()
-def test():
+def enviarAvaliacao():
     requestList = request.form
     requestList = requestList.to_dict()
     requestList['data-avaliacao'] = str(datetime.now().strftime('%d/%m/%y %H:%M'))
@@ -25,3 +26,13 @@ def test():
     mdb.db.fatec.insert_one(fullJson)
     
     return "Avaliação enviada! Obrigado."
+
+@app.route("/pacer/aluno")
+@cross_origin()
+def listarAlunos():
+    alunos = []
+    cursor = mdb.db.alunos.find({})
+    for document in cursor:
+          alunos.append(document)
+
+    return str(alunos)
