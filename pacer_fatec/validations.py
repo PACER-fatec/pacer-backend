@@ -4,7 +4,8 @@ from bson.objectid import ObjectId
 def aluno_pode_avaliar(json):
     avaliador = json['avaliador']
     avaliado = json['avaliado']
-    avaliacoes_existentes = mdb.db.fatec.find({ 'avaliador': avaliador, 'avaliado': avaliado }).count()
+    sprint = json['sprint']
+    avaliacoes_existentes = mdb.db.fatec.find({ 'avaliador': avaliador, 'avaliado': avaliado, 'sprint': sprint}).count()
     if avaliacoes_existentes > 0:
         return False
     return True
