@@ -23,6 +23,12 @@ def enviarAvaliacao():
     requestList = request.form
     requestList = requestList.to_dict()
     requestList['data-avaliacao'] = str(datetime.now().strftime('%d/%m/%y %H:%M'))
+
+    avaliador = mdb.db.alunos.find_one({'_id': ObjectId(requestList['avaliador'])})
+    avaliado = mdb.db.alunos.find_one({'_id': ObjectId(requestList['avaliado'])})
+    requestList['avaliador'] = avaliador['nome']
+    requestList['avaliado'] = avaliado['nome']
+    
     fullJson = json.loads(json.dumps(requestList))
     mdb.db.fatec.insert_one(fullJson)
     return "Avaliação enviada! Obrigado."
