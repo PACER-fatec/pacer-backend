@@ -6,6 +6,7 @@ import json
 import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
+from validations import aluno_pode_avaliar
 
 #Importar alunos do arquivo /resources/alunos.csv
 #DESCOMENTE A LINHA 11 SE A TABELA ALUNOS ESTIVER VAZIA. COMENTE PARA NÃO TER ERRO DE DUPLICIDADE.
@@ -28,10 +29,15 @@ def enviarAvaliacao():
     avaliado = mdb.db.alunos.find_one({'_id': ObjectId(requestList['avaliado'])})
     requestList['avaliador'] = avaliador['nome']
     requestList['avaliado'] = avaliado['nome']
-    
+
     fullJson = json.loads(json.dumps(requestList))
-    mdb.db.fatec.insert_one(fullJson)
-    return "Avaliação enviada! Obrigado."
+    mensagem = ''
+    if aluno_pode_avaliar(fullJson):
+        mdb.db.fatec.insert_one(fullJson)
+        mensagem = "Avaliação enviada! Obrigado."
+    else:
+        mensagem = "Este avaliador não pode avaliar a mesma pessoa mais de uma vez."
+    return mensagem
 
 @app.route("/pacer/aluno")
 @cross_origin()
