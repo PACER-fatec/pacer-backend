@@ -38,6 +38,7 @@ def listarAluno():
     return str(alunos)
 
 @app.route('/pacer/alunos')
+@cross_origin()
 def listarAlunos():
     alunos = mdb.db.alunos.find()
     response = []
@@ -47,6 +48,7 @@ def listarAlunos():
     return json.dumps(response)
 
 @app.route('/pacer/alunos/<int:grupo>')
+@cross_origin()
 def clearAssessedSelect(grupo):
     filt = {'grupo': grupo}
     f = mdb.db.alunos.find_one(filt)
