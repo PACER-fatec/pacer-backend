@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import cross_origin
 from flask_pymongo import pymongo
 from datetime import datetime
 import json
+import csv
 import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
@@ -65,3 +66,35 @@ def clearAssessedSelect(grupo):
     filt = {'grupo': grupo}
     f = mdb.db.alunos.find_one(filt)
     return json.dumps(f)
+
+@app.route('/pacer/csvfile')
+@cross_origin()
+def relatorio():
+    relatorio = mdb.db.fatec.find()
+    response = []
+    for doc in relatorio:
+        del doc['_id']
+        response.append(doc)
+
+    jsonToCsv = json.dumps(response)
+    jsonToCsv = json.loads(jsonToCsv)
+
+    file = open("./pacer_fatec/resources/relatorio.csv", "w", newline='', encoding='utf-8')
+    f = csv.writer(file)
+
+    f.writerow(["sprint", "avaliador", "avaliado", "proatividade", "autonomia",
+                "colaboracao", "entrega-resultados", "data-avaliacao"])
+
+    for linha in jsonToCsv:        
+        f.writerow([linha["sprint"],
+                    linha["avaliador"],
+                    linha["avaliado"],
+                    linha["proatividade"],
+                    linha["autonomia"],
+                    linha["colaboracao"],
+                    linha["entrega-resultados"],
+                    linha["data-avaliacao"]])
+
+    file.close()
+
+    return send_file('./resources/relatorio.csv')
