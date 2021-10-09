@@ -79,7 +79,7 @@ def relatorio():
     jsonToCsv = json.dumps(response)
     jsonToCsv = json.loads(jsonToCsv)
 
-    file = open("./pacer_fatec/resources/relatorio.csv", "w", newline='', encoding='utf-8')
+    file = open("./resources/relatorio.csv", "w", newline='', encoding='utf-8')
     f = csv.writer(file)
 
     f.writerow(["sprint", "avaliador", "avaliado", "proatividade", "autonomia",
