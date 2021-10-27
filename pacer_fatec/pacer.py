@@ -1,17 +1,14 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, request
 from flask_cors import cross_origin
 from flask_pymongo import pymongo
 from datetime import datetime
+import os
 import json
 import csv
 import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
 from validations import aluno_pode_avaliar
-
-#Importar alunos do arquivo /resources/alunos.csv
-#DESCOMENTE A LINHA 11 SE A TABELA ALUNOS ESTIVER VAZIA. COMENTE PARA NÃO TER ERRO DE DUPLICIDADE.
-#imdb.importAlunos()
 
 app = Flask(__name__)
 
@@ -67,6 +64,13 @@ def clearAssessedSelect(grupo):
     f = mdb.db.alunos.find_one(filt)
     return json.dumps(f)
 
+@app.route('/pacer/uploadAlunos', methods = ['POST'])
+@cross_origin()
+def uploadAlunos():
+    f = request.files.get('alunos')
+    f.save(os.path.join('./pacer_fatec/resources', f.filename))
+    return ('', 204)
+
 @app.route('/pacer/csvfile')
 @cross_origin()
 def relatorio():
@@ -79,7 +83,7 @@ def relatorio():
     jsonToCsv = json.dumps(response)
     jsonToCsv = json.loads(jsonToCsv)
 
-    file = open("./resources/relatorio.csv", "w", newline='', encoding='utf-8')
+    file = open("./pacer_fatec/resources/relatorio.csv", "w", newline='', encoding='utf-8')
     f = csv.writer(file)
 
     f.writerow(["sprint", "avaliador", "avaliado", "proatividade", "autonomia",
