@@ -69,6 +69,7 @@ def clearAssessedSelect(grupo):
 def uploadAlunos():
     f = request.files.get('alunos')
     f.save(os.path.join('./pacer_fatec/resources', f.filename))
+    imdb.importAlunos()
     return ('', 204)
 
 @app.route('/pacer/csvfile')
