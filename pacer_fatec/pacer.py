@@ -12,6 +12,9 @@ from validations import aluno_pode_avaliar
 
 app = Flask(__name__)
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
+
 @app.route("/")
 def hello():
     return "Pepino Denovo!"
@@ -68,7 +71,7 @@ def clearAssessedSelect(grupo):
 @cross_origin()
 def uploadAlunos():
     f = request.files.get('alunos')
-    f.save(os.path.join('./pacer_fatec/resources', f.filename))
+    f.save(os.path.join(RES_DIR, f.filename))
     imdb.importAlunos()
     return ('', 204)
 
@@ -84,7 +87,7 @@ def relatorio():
     jsonToCsv = json.dumps(response)
     jsonToCsv = json.loads(jsonToCsv)
 
-    file = open("./pacer_fatec/resources/relatorio.csv", "w", newline='', encoding='utf-8')
+    file = open(f"{RES_DIR}//relatorio.csv", "w", newline='', encoding='utf-8')
     f = csv.writer(file)
 
     f.writerow(["sprint", "avaliador", "avaliado", "proatividade", "autonomia",
@@ -102,4 +105,4 @@ def relatorio():
 
     file.close()
 
-    return send_file('./resources/relatorio.csv')
+    return send_file(f'{RES_DIR}//relatorio.csv')
