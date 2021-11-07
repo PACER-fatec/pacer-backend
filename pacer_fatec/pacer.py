@@ -9,11 +9,26 @@ import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
 from validations import aluno_pode_avaliar
+from functools import wraps
+from models import User
 
 app = Flask(__name__)
+app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.pUser().login()ath.dirname(os.path.abspath(__file__)))
 RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
+
+# Decorators
+def login_required(f):
+  @wraps(f)
+  def wrap(*args, **kwargs):
+    if 'logged_in' in session:
+      return f(*args, **kwargs)
+    else:
+      return redirect('/')
+  
+  return wrap
+
 
 @app.route("/")
 def hello():
@@ -106,3 +121,26 @@ def relatorio():
     file.close()
 
     return send_file(f'{RES_DIR}//relatorio.csv')
+
+
+@app.route('/pacer/professores')
+@cross_origin()
+def listarProfessor():
+    alunos = mdb.db.users.find()
+    response = []
+    for aluno in alunos:
+        aluno['_id'] = str(aluno['_id'])
+        response.append(aluno)
+    return json.dumps(response)
+
+@app.route('/pacer/signup', methods=['POST'])
+def signup():
+  return User().signup()
+
+@app.route('/pacer/signout')
+def signout():
+  return User().signout()
+
+@app.route('/pacer/login', methods=['POST'])
+def login():
+  return User().login()
