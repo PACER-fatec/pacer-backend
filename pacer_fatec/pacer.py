@@ -106,3 +106,17 @@ def relatorio():
     file.close()
 
     return send_file(f'{RES_DIR}//relatorio.csv')
+
+@app.route('/pacer/login', methods = ['POST'])
+@cross_origin()
+def login():
+    requestList = request.form
+    requestList = requestList.to_dict()
+
+    acessoDB = mdb.db.professor.find_one()
+    if requestList['email'] == acessoDB['nome'] and requestList['senha'] == acessoDB['senha']:
+        if acessoDB['primeiro-acesso'] == True:
+            print('pimbas')
+        return 'true'
+    else:
+        return 'false'
