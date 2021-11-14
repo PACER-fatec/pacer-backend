@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify, send_file, request
 from flask_cors import cross_origin
 from flask_pymongo import pymongo
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import json
 import csv
+
 import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
@@ -21,7 +22,7 @@ def hello():
 
 @app.route("/pacer", methods = ['POST'])
 @cross_origin()
-def enviarAvaliacao():
+def enviarAvaliacao ():
     requestList = request.form
     requestList = requestList.to_dict()
     requestList['data-avaliacao'] = str(datetime.now().strftime('%d/%m/%y %H:%M'))
@@ -42,7 +43,7 @@ def enviarAvaliacao():
 
 @app.route("/pacer/aluno")
 @cross_origin()
-def listarAluno():
+def listarAluno ():
     alunos = []
     cursor = mdb.db.alunos.find({})
     for document in cursor:
@@ -52,7 +53,7 @@ def listarAluno():
 
 @app.route('/pacer/alunos')
 @cross_origin()
-def listarAlunos():
+def listarAlunos ():
     alunos = mdb.db.alunos.find()
     response = []
     for aluno in alunos:
@@ -62,14 +63,14 @@ def listarAlunos():
 
 @app.route('/pacer/alunos/<int:grupo>')
 @cross_origin()
-def clearAssessedSelect(grupo):
+def clearAssessedSelect (grupo):
     filt = {'grupo': grupo}
     f = mdb.db.alunos.find_one(filt)
     return json.dumps(f)
 
 @app.route('/pacer/uploadAlunos', methods = ['POST'])
 @cross_origin()
-def uploadAlunos():
+def uploadAlunos ():
     f = request.files.get('alunos')
     f.save(os.path.join(RES_DIR, f.filename))
     imdb.importAlunos()
@@ -77,7 +78,7 @@ def uploadAlunos():
 
 @app.route('/pacer/csvfile')
 @cross_origin()
-def relatorio():
+def relatorio ():
     relatorio = mdb.db.fatec.find()
     response = []
     for doc in relatorio:
@@ -106,3 +107,32 @@ def relatorio():
     file.close()
 
     return send_file(f'{RES_DIR}//relatorio.csv')
+
+@app.route('/pacer/login', methods = ['POST'])
+@cross_origin()
+def login ():
+    requestDict = request.form.to_dict()
+
+    acessoDB = mdb.db.professor.find_one({'nome': requestDict['nome']})
+    
+    if requestDict['nome'] == acessoDB['nome'] and requestDict['senha'] == acessoDB['senha']:
+        response = {
+            'primeiroAcesso': acessoDB['primeiro-acesso'],
+            'nome': acessoDB['nome'],
+            'sessionStart': datetime.now().strftime('%d/%m/%Y %H:%M')
+        }
+        return response
+    else:
+        raise ValueError('Nome ou senha incorretos!')
+
+@app.route('/pacer/login/novasenha', methods = ['POST'])
+@cross_origin()
+def novasenha ():
+    requestDict = request.form.to_dict()
+
+    myquery = { "nome": "professor" }
+    newvalues = { "$set": { "senha": requestDict['senha'] , "primeiro-acesso": False} }
+
+    mdb.db.professor.update_one(myquery, newvalues)
+    
+    return {}
