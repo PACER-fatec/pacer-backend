@@ -1,5 +1,4 @@
 import mdb_connection as mdb
-from bson.objectid import ObjectId
 
 def aluno_pode_avaliar(json):
     avaliador = json['avaliador']
