@@ -13,10 +13,6 @@ from validations import aluno_pode_avaliar, sprints, alunosGrafico
 
 app = Flask(__name__)
 
-print('\n')
-print(alunosGrafico())
-print('\n')
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
 
