@@ -9,9 +9,13 @@ import csv
 import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
-from validations import aluno_pode_avaliar
+from validations import aluno_pode_avaliar, sprints, alunosGrafico
 
 app = Flask(__name__)
+
+print('\n')
+print(alunosGrafico())
+print('\n')
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
@@ -136,3 +140,13 @@ def novasenha ():
     mdb.db.professor.update_one(myquery, newvalues)
     
     return {}
+
+@app.route('/pacer/sprints')
+@cross_origin()
+def numeroDeSprints():
+    return str(sprints())
+
+@app.route('/pacer/alunosID')
+@cross_origin()
+def nomeAlunoID():
+    return alunosGrafico()
