@@ -9,7 +9,8 @@ import csv
 import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
-from validations import aluno_pode_avaliar, sprints, alunosGrafico
+from validations import aluno_pode_avaliar
+from service import alunosGrafico, sprints
 
 app = Flask(__name__)
 
