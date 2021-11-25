@@ -147,3 +147,25 @@ def numeroDeSprints():
 @cross_origin()
 def nomeAlunoID():
     return alunosGrafico()
+
+def mediaAluno (nome):
+    proatividade = 0
+    autonomia = 0
+    colaboracao = 0
+    entrega_resultados = 0
+
+    lista = list(mdb.db.fatec.find({"avaliado": nome}, {"_id": 0,"avaliado": 1, "proatividade": 1, "autonomia": 1, "colaboracao": 1, "entrega-resultados": 1}))
+    for i in range(len(lista)):
+        to_json = json.dumps(lista[i])
+        x = json.loads(to_json)
+        proatividade += int(x["proatividade"])
+        autonomia += int(x["autonomia"])
+        colaboracao += int(x["colaboracao"])
+        entrega_resultados += int(x["entrega-resultados"])
+
+    media_aluno = []
+    media_aluno.append(proatividade / len(lista))
+    media_aluno.append(autonomia / len(lista))
+    media_aluno.append(colaboracao / len(lista))
+    media_aluno.append(entrega_resultados / len(lista))
+    return media_aluno
