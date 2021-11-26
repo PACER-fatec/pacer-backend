@@ -149,23 +149,13 @@ def nomeAlunoID():
     return alunosGrafico()
 
 def mediaAluno (nome):
-    proatividade = 0
-    autonomia = 0
-    colaboracao = 0
-    entrega_resultados = 0
+    avaliacoes = list(mdb.db.fatec.find({"avaliado": nome}, {"_id": 0,"avaliado": 1, "proatividade": 1, "autonomia": 1, "colaboracao": 1, "entrega-resultados": 1}))
 
-    lista = list(mdb.db.fatec.find({"avaliado": nome}, {"_id": 0,"avaliado": 1, "proatividade": 1, "autonomia": 1, "colaboracao": 1, "entrega-resultados": 1}))
-    for i in range(len(lista)):
-        to_json = json.dumps(lista[i])
-        x = json.loads(to_json)
-        proatividade += int(x["proatividade"])
-        autonomia += int(x["autonomia"])
-        colaboracao += int(x["colaboracao"])
-        entrega_resultados += int(x["entrega-resultados"])
+    proatividade = sum([int(a['proatividade']) for a in avaliacoes]) / len(avaliacoes)
+    autonomia = sum([int(a['autonomia']) for a in avaliacoes]) / len(avaliacoes)
+    colaboracao = sum([int(a['colaboracao']) for a in avaliacoes]) / len(avaliacoes)
+    entrega_resultados = sum([int(a['entrega-resultados']) for a in avaliacoes]) / len(avaliacoes)
 
-    media_aluno = []
-    media_aluno.append(proatividade / len(lista))
-    media_aluno.append(autonomia / len(lista))
-    media_aluno.append(colaboracao / len(lista))
-    media_aluno.append(entrega_resultados / len(lista))
-    return media_aluno
+    return [round(proatividade, 2), round(autonomia, 2), round(colaboracao, 2), round(entrega_resultados, 2)]
+
+print(mediaAluno('Andre Pires'))
