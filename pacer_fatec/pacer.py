@@ -148,8 +148,6 @@ def numeroDeSprints():
 def mediaAluno ():
     requestDict = request.form.to_dict()
 
-    # TO-DO: quando for fazer a do grupo, please retorna um dict assim: {aluno: [lista de médias aluno], grupo: [media do grupo]} e MANO USA O JSON DUMPS ELE É LEGAL
-
     avaliacoes = list(mdb.db.fatec.find({"avaliado": requestDict['nome'], "sprint": requestDict['sprint']}, {"_id": 0,"avaliado": 1, "proatividade": 1, "autonomia": 1, "colaboracao": 1, "entrega-resultados": 1}))
 
     grupoAlunosList = grupoAluno(requestDict)
