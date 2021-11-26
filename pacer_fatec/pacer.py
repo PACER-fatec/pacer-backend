@@ -10,7 +10,7 @@ import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
 from validations import aluno_pode_avaliar
-from service import alunosGrafico, sprints
+from service import alunosGrafico, sprints, grupoAluno, mediaAlunos
 
 app = Flask(__name__)
 
@@ -152,12 +152,7 @@ def mediaAluno ():
 
     avaliacoes = list(mdb.db.fatec.find({"avaliado": requestDict['nome'], "sprint": requestDict['sprint']}, {"_id": 0,"avaliado": 1, "proatividade": 1, "autonomia": 1, "colaboracao": 1, "entrega-resultados": 1}))
 
-    if avaliacoes:
-        proatividade = sum([int(a['proatividade']) for a in avaliacoes]) / len(avaliacoes)
-        autonomia = sum([int(a['autonomia']) for a in avaliacoes]) / len(avaliacoes)
-        colaboracao = sum([int(a['colaboracao']) for a in avaliacoes]) / len(avaliacoes)
-        entrega_resultados = sum([int(a['entrega-resultados']) for a in avaliacoes]) / len(avaliacoes)
+    grupoAlunosList = grupoAluno(requestDict)
+    mediaAlunoList = mediaAlunos(avaliacoes)
 
-        return json.dumps([round(proatividade, 2), round(autonomia, 2), round(colaboracao, 2), round(entrega_resultados, 2)])
-    
-    return json.dumps([])
+    return json.dumps({'aluno': mediaAlunoList, 'grupo': grupoAlunosList})
