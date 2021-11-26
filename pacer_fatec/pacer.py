@@ -148,6 +148,8 @@ def numeroDeSprints():
 def nomeAlunoID():
     return alunosGrafico()
 
+@app.route('/pacer/mediaAluno/<str:nome>')
+@cross_origin()
 def mediaAluno (nome):
     avaliacoes = list(mdb.db.fatec.find({"avaliado": nome}, {"_id": 0,"avaliado": 1, "proatividade": 1, "autonomia": 1, "colaboracao": 1, "entrega-resultados": 1}))
 
