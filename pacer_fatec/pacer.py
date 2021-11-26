@@ -157,5 +157,3 @@ def mediaAluno (nome):
     entrega_resultados = sum([int(a['entrega-resultados']) for a in avaliacoes]) / len(avaliacoes)
 
     return [round(proatividade, 2), round(autonomia, 2), round(colaboracao, 2), round(entrega_resultados, 2)]
-
-print(mediaAluno('Andre Pires'))
