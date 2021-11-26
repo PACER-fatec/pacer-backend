@@ -141,21 +141,23 @@ def novasenha ():
 @app.route('/pacer/sprints')
 @cross_origin()
 def numeroDeSprints():
-    return str(sprints())
+    return json.dumps(sprints())
 
-@app.route('/pacer/alunosID')
+@app.route('/pacer/media', methods = ['POST'])
 @cross_origin()
-def nomeAlunoID():
-    return alunosGrafico()
+def mediaAluno ():
+    requestDict = request.form.to_dict()
 
-@app.route('/pacer/mediaAluno/<nome>')
-@cross_origin()
-def mediaAluno (nome):
-    avaliacoes = list(mdb.db.fatec.find({"avaliado": nome}, {"_id": 0,"avaliado": 1, "proatividade": 1, "autonomia": 1, "colaboracao": 1, "entrega-resultados": 1}))
+    # TO-DO: quando for fazer a do grupo, please retorna um dict assim: {aluno: [lista de médias aluno], grupo: [media do grupo]} e MANO USA O JSON DUMPS ELE É LEGAL
 
-    proatividade = sum([int(a['proatividade']) for a in avaliacoes]) / len(avaliacoes)
-    autonomia = sum([int(a['autonomia']) for a in avaliacoes]) / len(avaliacoes)
-    colaboracao = sum([int(a['colaboracao']) for a in avaliacoes]) / len(avaliacoes)
-    entrega_resultados = sum([int(a['entrega-resultados']) for a in avaliacoes]) / len(avaliacoes)
+    avaliacoes = list(mdb.db.fatec.find({"avaliado": requestDict['nome'], "sprint": requestDict['sprint']}, {"_id": 0,"avaliado": 1, "proatividade": 1, "autonomia": 1, "colaboracao": 1, "entrega-resultados": 1}))
 
-    return [round(proatividade, 2), round(autonomia, 2), round(colaboracao, 2), round(entrega_resultados, 2)]
+    if avaliacoes:
+        proatividade = sum([int(a['proatividade']) for a in avaliacoes]) / len(avaliacoes)
+        autonomia = sum([int(a['autonomia']) for a in avaliacoes]) / len(avaliacoes)
+        colaboracao = sum([int(a['colaboracao']) for a in avaliacoes]) / len(avaliacoes)
+        entrega_resultados = sum([int(a['entrega-resultados']) for a in avaliacoes]) / len(avaliacoes)
+
+        return json.dumps([round(proatividade, 2), round(autonomia, 2), round(colaboracao, 2), round(entrega_resultados, 2)])
+    
+    return json.dumps([])
