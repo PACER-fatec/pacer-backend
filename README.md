@@ -10,7 +10,7 @@ pip install flask
 Mac and linux
 export FLASK_APP=pacer.py
 Windows
-set FLASK_APP=pacer.py
+$env:FLASK_APP = "pacer.py"
 
 flask run
 ```
