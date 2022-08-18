@@ -14,8 +14,14 @@ from service import alunosGrafico, sprints, grupoAluno, mediaAlunos
 
 app = Flask(__name__)
 
+PORT = os.environ.PORT__or__5000
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
+
+@app.listen(PORT)
+def listening(): {
+    print('Listening on port: ' + PORT)
+}
 
 @app.route("/")
 def hello():
