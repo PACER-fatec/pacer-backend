@@ -1,1 +1,1 @@
-web: sh -c 'cd ./pacer_fatec/ && flask run'
+web: sh -c '$env:FLASK_APP = "pacer.py" && cd ./pacer_fatec/ && flask run'
