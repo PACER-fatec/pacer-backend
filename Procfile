@@ -1,1 +1,1 @@
-web: python pacer_fatec/pacer.py runserver 0.0.0.0:5000
+web: gunicorn app:pacer_fatec/pacer
