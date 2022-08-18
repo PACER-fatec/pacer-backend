@@ -1,1 +1,1 @@
-web: gunicorn app:pacer_fatec/pacer
+web: gunicorn pacer_fatec/pacer:app
