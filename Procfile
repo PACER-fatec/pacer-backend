@@ -1,1 +1,0 @@
-web: python ./pacer_fatec/pacer.py runserver 0.0.0.0:5000
