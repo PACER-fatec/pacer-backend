@@ -9,10 +9,12 @@ import csv
 import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
+from os import environ
 from validations import aluno_pode_avaliar
 from service import alunosGrafico, sprints, grupoAluno, mediaAlunos
 
 app = Flask(__name__)
+app.run(debug=False, port=environ.get("PORT", 5000))
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
