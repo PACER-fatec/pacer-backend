@@ -1,1 +1,1 @@
-web: sh -c 'cd ./pacer_fatec/ && export FLASK_APP=pacer.py && flask run'
+web: gunicorn -b 0.0.0.0:$PORT geeni:./pacer_fatec/pacer
