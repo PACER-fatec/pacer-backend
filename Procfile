@@ -1,1 +1,1 @@
-web: sh -c 'cd ./pacer_fatec/ && export FLASK_APP=pacer.py && flask run'
+web: python ./pacer_fatec/pacer.py runserver 0.0.0.0:5000
