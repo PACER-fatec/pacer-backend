@@ -1,1 +1,1 @@
-web: gunicorn pacer.py
+web: sh -c 'cd ./pacer_fatec/ && flask run'
