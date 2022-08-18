@@ -1,1 +1,1 @@
-web: gunicorn pacer_fatec/pacer:app
+web: gunicorn --chdir pacer_fatec pacer:app
