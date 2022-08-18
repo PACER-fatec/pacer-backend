@@ -14,7 +14,10 @@ from validations import aluno_pode_avaliar
 from service import alunosGrafico, sprints, grupoAluno, mediaAlunos
 
 app = Flask(__name__)
-app.run(host='0.0.0.0', port=os.environ.get('PORT', '5000'))
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=os.environ.get('PORT', '5000'))
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
