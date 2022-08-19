@@ -20,7 +20,7 @@ RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
 
 @app.route("/")
 def hello():
-    return "Heil Dslayer!"
+    return "PACER SERVER WORKING!"
 
 @app.route("/pacer", methods = ['POST'])
 @cross_origin()
