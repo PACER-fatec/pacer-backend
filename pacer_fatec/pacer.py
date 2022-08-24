@@ -56,7 +56,6 @@ def cadastro ():
     return "Cadastro concluído!"
 
 @app.route("/pacer/aluno")
-@cross_origin(origins={'*'})
 def listarAluno ():
     alunos = []
     cursor = mdb.db.alunos.find({})
