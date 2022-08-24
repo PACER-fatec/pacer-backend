@@ -44,7 +44,7 @@ def enviarAvaliacao ():
     return mensagem
 
 @app.route('/pacer/cadastro', methods = ['POST'])
-@cross_origin()
+@cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def cadastro ():
     requestDict = request.json
 
