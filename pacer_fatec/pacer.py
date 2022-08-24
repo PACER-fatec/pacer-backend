@@ -1,3 +1,4 @@
+import re
 from flask import Flask, request, jsonify, send_file, request
 from flask_cors import CORS
 from flask_pymongo import pymongo
@@ -45,11 +46,10 @@ def enviarAvaliacao ():
 
 @app.route('/pacer/cadastro', methods = ['POST'])
 def cadastro ():
-    requestDict = request.json
+    requestList = request.form
+    requestList = requestList.to_dict()
 
-    print(requestDict)
-
-    fullJson = json.loads(json.dumps(requestDict))
+    fullJson = json.loads(json.dumps(requestList))
     mdb.db.users.insert_one(fullJson)
 
     return "Cadastro concluído!"
