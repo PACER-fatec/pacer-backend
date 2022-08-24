@@ -20,7 +20,7 @@ RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
 
 @app.route("/")
 def hello():
-    return "PACER SERVER WORKING!"
+    return "PACER SERVER WORKING! (v1.01)"
 
 @app.route("/pacer", methods = ['POST'])
 @cross_origin()
@@ -42,6 +42,18 @@ def enviarAvaliacao ():
     else:
         mensagem = "Este avaliador não pode avaliar a mesma pessoa mais de uma vez."
     return mensagem
+
+@app.route('/pacer/cadastro', methods = ['POST'])
+@cross_origin()
+def cadastro ():
+    requestDict = request.json
+
+    print(requestDict)
+
+    fullJson = json.loads(json.dumps(requestDict))
+    mdb.db.users.insert_one(fullJson)
+
+    return "Cadastro concluído!"
 
 @app.route("/pacer/aluno")
 @cross_origin()
