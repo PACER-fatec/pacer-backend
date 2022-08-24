@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, send_file, request
-from flask_cors import cross_origin
+from flask_cors import CORS
 from flask_pymongo import pymongo
 from datetime import datetime, timedelta
 import os
@@ -14,6 +14,7 @@ from validations import aluno_pode_avaliar
 from service import alunosGrafico, sprints, grupoAluno, mediaAlunos
 
 app = Flask(__name__)
+CORS(app)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
@@ -23,7 +24,6 @@ def hello():
     return "PACER SERVER WORKING! (v1.01)"
 
 @app.route("/pacer", methods = ['POST'])
-@cross_origin()
 def enviarAvaliacao ():
     requestList = request.form
     requestList = requestList.to_dict()
@@ -44,7 +44,6 @@ def enviarAvaliacao ():
     return mensagem
 
 @app.route('/pacer/cadastro', methods = ['POST'])
-@cross_origin()
 def cadastro ():
     requestDict = request.json
 
@@ -65,7 +64,6 @@ def listarAluno ():
     return str(alunos)
 
 @app.route('/pacer/alunos')
-@cross_origin()
 def listarAlunos ():
     alunos = mdb.db.alunos.find()
     response = []
@@ -75,14 +73,12 @@ def listarAlunos ():
     return json.dumps(response)
 
 @app.route('/pacer/alunos/<int:grupo>')
-@cross_origin()
 def clearAssessedSelect (grupo):
     filt = {'grupo': grupo}
     f = mdb.db.alunos.find_one(filt)
     return json.dumps(f)
 
 @app.route('/pacer/uploadAlunos', methods = ['POST'])
-@cross_origin()
 def uploadAlunos ():
     f = request.files.get('alunos')
     f.save(os.path.join(RES_DIR, f.filename))
@@ -90,7 +86,6 @@ def uploadAlunos ():
     return ('', 204)
 
 @app.route('/pacer/csvfile')
-@cross_origin()
 def relatorio ():
     relatorio = mdb.db.fatec.find()
     response = []
@@ -122,7 +117,6 @@ def relatorio ():
     return send_file(f'{RES_DIR}//relatorio.csv')
 
 @app.route('/pacer/login', methods = ['POST'])
-@cross_origin()
 def login ():
     requestDict = request.form.to_dict()
 
@@ -139,7 +133,6 @@ def login ():
         raise ValueError('Nome ou senha incorretos!')
 
 @app.route('/pacer/login/novasenha', methods = ['POST'])
-@cross_origin()
 def novasenha ():
     requestDict = request.form.to_dict()
 
@@ -151,12 +144,10 @@ def novasenha ():
     return {}
 
 @app.route('/pacer/sprints')
-@cross_origin()
 def numeroDeSprints():
     return json.dumps(sprints())
 
 @app.route('/pacer/media', methods = ['POST'])
-@cross_origin()
 def mediaAluno ():
     requestDict = request.form.to_dict()
 
