@@ -44,6 +44,7 @@ def enviarAvaliacao ():
     return mensagem
 
 @app.route('/pacer/cadastro', methods = ['POST'])
+@cross_origin()
 def cadastro ():
     requestDict = request.json
 
