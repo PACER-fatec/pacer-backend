@@ -22,7 +22,7 @@ RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
 
 @app.route("/")
 def hello():
-    return "PACER SERVER WORKING! (v1.01)"
+    return "PACER SERVER WORKING! (v1.02)"
 
 @app.route("/pacer", methods = ['POST'])
 def enviarAvaliacao ():
@@ -48,6 +48,7 @@ def enviarAvaliacao ():
 def cadastro ():
     requestList = request.form
     requestList = requestList.to_dict()
+    requestList['ROLE'] = 'ROLE_ALUNO'
 
     fullJson = json.loads(json.dumps(requestList))
     mdb.db.users.insert_one(fullJson)
@@ -120,17 +121,17 @@ def relatorio ():
 def login ():
     requestDict = request.form.to_dict()
 
-    acessoDB = mdb.db.professor.find_one({'nome': requestDict['nome']})
+    acessoDB = mdb.db.users.find_one({'email': requestDict['email']})
     
-    if requestDict['nome'] == acessoDB['nome'] and requestDict['senha'] == acessoDB['senha']:
+    if requestDict['email'] == acessoDB['email'] and requestDict['senha'] == acessoDB['senha']:
         response = {
-            'primeiroAcesso': acessoDB['primeiro-acesso'],
-            'nome': acessoDB['nome'],
+            'email': acessoDB['email'],
+            'ROLE': acessoDB['ROLE'],
             'sessionStart': datetime.now().strftime('%d/%m/%Y %H:%M')
         }
         return response
     else:
-        raise ValueError('Nome ou senha incorretos!')
+        raise ValueError('Email ou senha incorretos!')
 
 @app.route('/pacer/login/novasenha', methods = ['POST'])
 def novasenha ():
