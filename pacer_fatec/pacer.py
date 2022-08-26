@@ -125,7 +125,9 @@ def login ():
     
     if requestDict['email'] == acessoDB['email'] and requestDict['senha'] == acessoDB['senha']:
         response = {
+            'nome': acessoDB['nome'],
             'email': acessoDB['email'],
+            'ra': acessoDB['ra'],
             'ROLE': acessoDB['ROLE'],
             'sessionStart': datetime.now().strftime('%d/%m/%Y %H:%M')
         }
