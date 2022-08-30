@@ -13,7 +13,9 @@ import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
 from os import environ
+from pacer_fatec.groupValidations import existe_alunos, existe_grupo
 from validations import aluno_pode_avaliar
+import groupValidations
 from service import alunosGrafico, sprints, grupoAluno, mediaAlunos
 
 app = Flask(__name__)
@@ -167,13 +169,11 @@ def mediaAluno ():
 def cadastrarGrupo():
     requestList = request.json
 
-    #TO DO:
-    #Vereficar se todos os alunos existem
-    #Vereficar se o nome do grupo é único
+    erroAluno = existe_alunos(requestList['alunos'])
+    erroGrupo = existe_grupo(requestList['nome'])
 
-    if 1 == 1:
+    if not erroAluno and not erroGrupo:
         mdb.db.grupos.insert_one(requestList)
-        mensagem = "Grupo criado com sucesso!"
+        return "Grupo criado com sucesso!"
     else:
-        mensagem = "Erro ao criar o grupo."
-    return mensagem
+        return str(erroAluno) + '\n' + str(erroGrupo)
