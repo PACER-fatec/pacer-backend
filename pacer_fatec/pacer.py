@@ -1,4 +1,6 @@
+from asyncio.windows_events import NULL
 import re
+from tkinter import TRUE
 from flask import Flask, request, jsonify, send_file, request
 from flask_cors import CORS
 from flask_pymongo import pymongo
@@ -160,3 +162,18 @@ def mediaAluno ():
     mediaAlunoList = mediaAlunos(avaliacoes)
 
     return json.dumps({'aluno': mediaAlunoList, 'grupo': grupoAlunosList})
+
+@app.route('/pacer/cadastrarGrupo', methods = ['POST'])
+def cadastrarGrupo():
+    requestList = request.json
+
+    #TO DO:
+    #Vereficar se todos os alunos existem
+    #Vereficar se o nome do grupo é único
+
+    if 1 == 1:
+        mdb.db.grupos.insert_one(requestList)
+        mensagem = "Grupo criado com sucesso!"
+    else:
+        mensagem = "Erro ao criar o grupo."
+    return mensagem
