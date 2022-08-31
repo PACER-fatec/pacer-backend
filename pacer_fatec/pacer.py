@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_file, request
 from datetime import datetime
+from flask_cors import CORS
 import os
 import json
 import csv
@@ -13,6 +14,7 @@ from validations import aluno_pode_avaliar
 from service import sprints, grupoAluno, mediaAlunos
 
 app = Flask(__name__)
+CORS(app)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
