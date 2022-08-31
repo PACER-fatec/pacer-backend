@@ -26,7 +26,7 @@ RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
 
 @app.route("/")
 def hello():
-    return "PACER SERVER WORKING! (v1.03)"
+    return "PACER SERVER WORKING! (v1.04)"
 
 @app.route("/pacer", methods = ['POST'])
 def enviarAvaliacao ():
@@ -167,13 +167,15 @@ def mediaAluno ():
 
 @app.route('/pacer/cadastrarGrupo', methods = ['POST'])
 def cadastrarGrupo():
-    requestList = request.json
+    requestList = request.data
 
-    erroAluno = existe_alunos(requestList['alunos'])
-    erroGrupo = existe_grupo(requestList['nome'])
+    fullJson = json.loads(requestList)
+
+    erroAluno = existe_alunos(fullJson['alunos'])
+    erroGrupo = existe_grupo(fullJson['nome'])
 
     if not erroAluno and not erroGrupo:
-        mdb.db.grupos.insert_one(requestList)
+        mdb.db.grupos.insert_one(fullJson)
         return "Grupo criado com sucesso!"
     else:
         return str(erroAluno) + '\n' + str(erroGrupo)
