@@ -1,4 +1,3 @@
-import re
 from flask import Flask, request, jsonify, send_file, request
 from flask_cors import CORS
 from flask_pymongo import pymongo
