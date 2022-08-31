@@ -1,22 +1,18 @@
 from flask import Flask, request, jsonify, send_file, request
-from flask_cors import CORS
-from flask_pymongo import pymongo
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 import json
 import csv
 
 import mdb_connection as mdb
 import importDb as imdb
-from bson import json_util, ObjectId
+from bson import  ObjectId
 from os import environ
 from groupValidations import existe_alunos, existe_grupo
 from validations import aluno_pode_avaliar
-import groupValidations
-from service import alunosGrafico, sprints, grupoAluno, mediaAlunos
+from service import sprints, grupoAluno, mediaAlunos
 
 app = Flask(__name__)
-CORS(app)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
