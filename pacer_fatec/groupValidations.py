@@ -1,7 +1,6 @@
 from asyncio.windows_events import NULL
 from pickle import FALSE, TRUE
 from queue import Empty
-from bson import json_util, ObjectId
 import mdb_connection as mdb
 
 def existe_alunos(alunos):
