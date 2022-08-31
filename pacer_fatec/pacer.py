@@ -13,7 +13,7 @@ import mdb_connection as mdb
 import importDb as imdb
 from bson import json_util, ObjectId
 from os import environ
-from pacer_fatec.groupValidations import existe_alunos, existe_grupo
+from groupValidations import existe_alunos, existe_grupo
 from validations import aluno_pode_avaliar
 import groupValidations
 from service import alunosGrafico, sprints, grupoAluno, mediaAlunos
