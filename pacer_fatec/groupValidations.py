@@ -11,10 +11,10 @@ def existe_alunos(alunos):
             mensagem = "ERRO: " + aluno + " não encontrado na base de dados!"
             return mensagem
 
-    return
+    return ''
 
 def existe_grupo(nomeGrupo):
     if mdb.db.grupos.find_one({'nome': nomeGrupo}):
         return "ERRO: Nome de grupo já utilizado!"
         
-    return
+    return ''
