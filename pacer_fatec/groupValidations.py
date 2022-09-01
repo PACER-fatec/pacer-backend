@@ -7,7 +7,7 @@ def existe_alunos(alunos):
     if not alunos:
         mensagem = "ERRO: Nenhum aluno encontrado"
     for aluno in alunos:
-        if not mdb.db.users.find_one({'email': aluno}):
+        if not mdb.db.users.find_one({'email': aluno}) and aluno != '':
             mensagem = "ERRO: " + aluno + " não encontrado na base de dados!"
             return mensagem
 
