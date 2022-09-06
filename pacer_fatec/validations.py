@@ -8,3 +8,9 @@ def aluno_pode_avaliar(json):
     if avaliacoes_existentes > 0:
         return False
     return True
+
+def existe_cadastro(email):
+    isEmailUsed = mdb.db.users.find({'email': email}).count()
+    if not isEmailUsed:
+        return False
+    return True

@@ -10,6 +10,7 @@ import importDb as imdb
 from bson import  ObjectId
 from os import environ
 from groupValidations import existe_alunos, existe_grupo
+from pacer_fatec.validations import existe_cadastro
 from validations import aluno_pode_avaliar
 from service import sprints, grupoAluno, mediaAlunos
 
@@ -21,7 +22,7 @@ RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
 
 @app.route("/")
 def hello():
-    return "PACER SERVER WORKING! (v1.04)"
+    return "PACER SERVER WORKING! (v1.05)"
 
 @app.route("/pacer", methods = ['POST'])
 def enviarAvaliacao ():
@@ -47,12 +48,18 @@ def enviarAvaliacao ():
 def cadastro ():
     requestList = request.form
     requestList = requestList.to_dict()
-    requestList['ROLE'] = 'ROLE_ALUNO'
 
     fullJson = json.loads(json.dumps(requestList))
-    mdb.db.users.insert_one(fullJson)
 
-    return "Cadastro concluído!"
+    erroAluno = existe_cadastro(fullJson['email'])
+
+    fullJson['ROLE'] = 'ROLE_ALUNO'
+
+    if erroAluno != False:
+        return "Email já cadastrado!"
+    else:
+        mdb.db.users.insert_one(fullJson)
+        return "Cadastro concluído!"
 
 @app.route("/pacer/aluno")
 def listarAluno ():
@@ -173,4 +180,4 @@ def cadastrarGrupo():
         mdb.db.grupos.insert_one(fullJson)
         return "Grupo criado com sucesso!"
     else:
-        return str(erroAluno) + '\n' + str(erroGrupo)
+        return str(erroAluno) + '<br>' + str(erroGrupo)
