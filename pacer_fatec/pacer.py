@@ -10,7 +10,7 @@ import importDb as imdb
 from bson import  ObjectId
 from os import environ
 from groupValidations import existe_alunos, existe_grupo
-from pacer_fatec.validations import existe_cadastro
+from validations import existe_cadastro
 from validations import aluno_pode_avaliar
 from service import sprints, grupoAluno, mediaAlunos
 
@@ -181,3 +181,20 @@ def cadastrarGrupo():
         return "Grupo criado com sucesso!"
     else:
         return str(erroAluno) + '<br>' + str(erroGrupo)
+
+@app.route('/pacer/gruposAlunoLogado')
+def grupoAlunoLogado():
+    requestList = request.data
+    fullJson = json.loads(requestList)
+
+    erroAluno = existe_cadastro(fullJson['email'])
+    grupos = []
+
+    if erroAluno == True:
+        gruposDB = mdb.db.grupos.find({'alunos': fullJson['email']})
+        for document in gruposDB:
+            grupos.append(document['nome'])
+            
+        return json.dumps(grupos)
+    else:
+        return 'null'
