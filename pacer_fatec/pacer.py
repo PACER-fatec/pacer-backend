@@ -22,7 +22,7 @@ RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
 
 @app.route("/")
 def hello():
-    return "PACER SERVER WORKING! (v1.05)"
+    return "PACER SERVER WORKING! (v1.06)"
 
 @app.route("/pacer", methods = ['POST'])
 def enviarAvaliacao ():
