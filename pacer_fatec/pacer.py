@@ -184,17 +184,17 @@ def cadastrarGrupo():
 
 @app.route('/pacer/gruposAlunoLogado')
 def grupoAlunoLogado():
-    requestList = request.data
-    fullJson = json.loads(requestList)
 
-    erroAluno = existe_cadastro(fullJson['email'])
+    erroAluno = existe_cadastro(request.args.get('email'))
     grupos = []
 
     if erroAluno == True:
-        gruposDB = mdb.db.grupos.find({'alunos': fullJson['email']})
+        gruposDB = mdb.db.grupos.find({'alunos': request.args.get('email')})
         for document in gruposDB:
             grupos.append(document['nome'])
             
+        print(json.dumps(grupos))
         return json.dumps(grupos)
     else:
+        print('null')
         return 'null'
