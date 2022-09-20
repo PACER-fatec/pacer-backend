@@ -198,3 +198,16 @@ def grupoAlunoLogado():
     else:
         print('null')
         return 'null'
+
+@app.route('/pacer/grupoSelecionado')
+def grupoSelecionado():
+
+    erroGrupo = existe_grupo(request.args.get('grupo'))
+
+    grupoDB = mdb.db.grupos.find({'nome': request.args.get('grupo')})
+
+    for documment in grupoDB:
+        if not erroGrupo:
+            return "ERRO: Grupo não encontrado!"
+        else:
+            return json.dumps(str(documment))
