@@ -1,3 +1,6 @@
+from pickle import FALSE
+from unittest import skip
+from xml.dom.minidom import Document
 from flask import Flask, request, jsonify, send_file, request
 from datetime import datetime
 from flask_cors import CORS
@@ -22,7 +25,7 @@ RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
 
 @app.route("/")
 def hello():
-    return "PACER SERVER WORKING! (v1.06)"
+    return "PACER SERVER WORKING! (v1.07)"
 
 @app.route("/pacer", methods = ['POST'])
 def enviarAvaliacao ():
@@ -201,13 +204,17 @@ def grupoAlunoLogado():
 
 @app.route('/pacer/grupoSelecionado')
 def grupoSelecionado():
+    grupoDB = json.dumps(list(mdb.db.grupos.find({'nome': request.args.get('grupo')},{'_id': False})))
 
-    erroGrupo = existe_grupo(request.args.get('grupo'))
+    alunos = json.loads(grupoDB)
+    alunos = alunos[0]['alunos']
+    resultado = []
 
-    grupoDB = mdb.db.grupos.find({'nome': request.args.get('grupo')})
-
-    for documment in grupoDB:
-        if not erroGrupo:
-            return "ERRO: Grupo não encontrado!"
+    for aluno in alunos:
+        if not aluno:
+            skip
         else:
-            return json.dumps(str(documment))
+            resultado.append(list(mdb.db.users.find({'email': aluno},
+                {'_id': False, 'email': False, 'ra': False, 'senha': False, 'ROLE': False})))
+        
+    return json.dumps(resultado)
