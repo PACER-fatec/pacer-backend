@@ -218,3 +218,8 @@ def grupoSelecionado():
                 {'_id': False, 'email': False, 'ra': False, 'senha': False, 'ROLE': False})))
         
     return json.dumps(resultado)
+
+@app.route('/pacer/skills')
+def listSkills():
+    skills = list(mdb.db.skills.find({}, {'_id': False}))
+    return str(skills)
