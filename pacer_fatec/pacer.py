@@ -25,7 +25,7 @@ RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
 
 @app.route("/")
 def hello():
-    return "PACER SERVER WORKING! (v1.07)"
+    return "PACER SERVER WORKING! (v1.08)"
 
 @app.route("/pacer", methods = ['POST'])
 def enviarAvaliacao ():
@@ -221,5 +221,11 @@ def grupoSelecionado():
 
 @app.route('/pacer/skills')
 def listSkills():
-    skills = list(mdb.db.skills.find({}, {'_id': False}))
-    return str(skills)
+    skills = []
+
+    skillsDB = list(mdb.db.skills.find({}, {'_id': False}))
+
+    for skill in skillsDB:
+        skills.append(skill)
+
+    return json.dumps(skills)
