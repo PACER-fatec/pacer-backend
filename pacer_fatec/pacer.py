@@ -31,10 +31,11 @@ def hello():
 def enviarAvaliacao ():
     requestList = request.form
     requestList = requestList.to_dict()
+
     requestList['data-avaliacao'] = str(datetime.now().strftime('%d/%m/%y %H:%M'))
 
-    avaliador = mdb.db.alunos.find_one({'_id': ObjectId(requestList['avaliador'])})
-    avaliado = mdb.db.alunos.find_one({'_id': ObjectId(requestList['avaliado'])})
+    avaliador = mdb.db.users.find_one({'email': requestList['avaliador']})
+    avaliado = mdb.db.users.find_one({'email': requestList['avaliado']})
     requestList['avaliador'] = avaliador['nome']
     requestList['avaliado'] = avaliado['nome']
 
@@ -215,7 +216,7 @@ def grupoSelecionado():
             skip
         else:
             resultado.append(list(mdb.db.users.find({'email': aluno},
-                {'_id': False, 'email': False, 'ra': False, 'senha': False, 'ROLE': False})))
+                {'_id': False, 'nome': False, 'ra': False, 'senha': False, 'ROLE': False})))
         
     return json.dumps(resultado)
 
