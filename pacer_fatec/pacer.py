@@ -16,6 +16,8 @@ from groupValidations import existe_alunos, existe_grupo
 from validations import existe_cadastro
 from validations import aluno_pode_avaliar
 from service import sprints, grupoAluno, mediaAlunos
+from bson import json_util
+from urllib.parse import unquote
 
 app = Flask(__name__)
 CORS(app)
@@ -205,20 +207,36 @@ def grupoAlunoLogado():
 
 @app.route('/pacer/grupoSelecionado')
 def grupoSelecionado():
-    grupoDB = json.dumps(list(mdb.db.grupos.find({'nome': request.args.get('grupo')},{'_id': False})))
+    # Obtenha o nome do grupo da solicitação
+    nome_grupo = request.args.get('grupo')
 
-    alunos = json.loads(grupoDB)
-    alunos = alunos[0]['alunos']
+    # Encontre o grupo com base no nome
+    grupo = mdb.db.grupos.find_one({'nome': nome_grupo}, {'_id': False})
+
+    # Verifique se o grupo existe
+    if not grupo:
+        return jsonify({'message': 'Grupo não encontrado'})
+
+    # Obtenha os alunos, as habilidades e o nome do grupo
+    alunos = grupo['alunos']
+    habilidades = grupo['skills']
+    nomeGrupo = grupo['nome']
+
+    print(habilidades)
+
+    # Inicialize a lista de resultados
     resultado = []
 
+    # Para cada aluno, encontre as informações do usuário e adicione à lista de resultados
     for aluno in alunos:
-        if not aluno:
-            skip
-        else:
-            resultado.append(list(mdb.db.users.find({'email': aluno},
-                {'_id': False, 'nome': False, 'ra': False, 'senha': False, 'ROLE': False})))
-        
-    return json.dumps(resultado)
+        if aluno:
+            usuario = mdb.db.users.find_one({'email': aluno}, {'_id': False, 'nome': True, 'email': True})
+            resultado.append(usuario)
+
+    # Retorne o nome do grupo, as habilidades e a lista de resultados
+    return jsonify({'nome': nomeGrupo, 'skills': habilidades, 'alunos': resultado})
+
+
 
 @app.route('/pacer/skills')
 def listSkills():
@@ -230,3 +248,21 @@ def listSkills():
         skills.append(skill)
 
     return json.dumps(skills)
+
+@app.route('/skills/descricao', methods=['GET'])
+def get_skills():
+    skills = request.args.getlist('skill')
+    # Adicione esta linha para decodificar os parâmetros da URL:
+    skills = [unquote(skill) for skill in skills]
+    results = []
+    for skill in skills:
+        query = {f"Skills.{skill}": {"$exists": True}}
+        projection = {f"Skills.{skill}": 1, "_id": 0}
+        data = mdb.db.skills.find_one(query, projection)
+        if data and data['Skills']:
+            skill_data = {}
+            for item in data['Skills']:
+                if skill in item:
+                    skill_data[skill] = item[skill]
+            results.append(skill_data)
+    return {'skills': results}
