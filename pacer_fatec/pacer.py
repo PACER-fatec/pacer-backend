@@ -78,7 +78,7 @@ def listarAluno ():
 
 @app.route('/pacer/alunos')
 def listarAlunos ():
-    alunos = mdb.db.alunos.find()
+    alunos = mdb.db.users.find({"ROLE": "ROLE_ALUNO" })
     response = []
     for aluno in alunos:
         aluno['_id'] = str(aluno['_id'])
@@ -208,10 +208,10 @@ def grupoAlunoLogado():
 @app.route('/pacer/grupoSelecionado')
 def grupoSelecionado():
     # Obtenha o nome do grupo da solicitação
-    nome_grupo = request.args.get('grupo')
+    nomeGrupo = request.args.get('grupo')
 
     # Encontre o grupo com base no nome
-    grupo = mdb.db.grupos.find_one({'nome': nome_grupo}, {'_id': False})
+    grupo = mdb.db.grupos.find_one({'nome': nomeGrupo}, {'_id': False})
 
     # Verifique se o grupo existe
     if not grupo:
@@ -266,3 +266,49 @@ def get_skills():
                     skill_data[skill] = item[skill]
             results.append(skill_data)
     return {'skills': results}
+
+@app.route('/pacer/grupos')
+def listarGrupos():
+    grupos = mdb.db.grupos.find()
+    response = []
+    for grupo in grupos:
+        grupo.pop('_id')
+        response.append(grupo)
+    return json.dumps(response)
+
+@app.route('/pacer/cadastrarAvaliacao', methods=['POST'])
+def cadastrar_avaliacao():
+    data = request.json
+    nome_grupo = data.get('nomeGrupo')
+    sprint = data.get('avaliacao').get('sprint')
+    nota = data.get('avaliacao').get('nota')
+    pontos = data.get('avaliacao').get('pontos')
+
+    # Verifica se já existe um registro para o mesmo nome de grupo e sprint
+    if mdb.db.avaliacoes.find_one({"nomeGrupo": nome_grupo, "sprint": sprint}):
+        return jsonify({"message": "Registro duplicado. Impossível realizar a operação."}), 400
+
+    # Insere a nova avaliação
+    try:
+        mdb.db.avaliacoes.insert_one({"nomeGrupo": nome_grupo, "sprint": sprint, "nota": nota, "pontos": pontos})
+        return jsonify({"message": "Avaliação cadastrada com sucesso."}), 201
+    except:
+        return jsonify({"message": "Erro interno. Não foi possível realizar a operação."}), 500
+
+@app.route('/pacer/pontos')
+def obter_pontos():
+    nome_grupo = request.args.get('grupo')
+    sprint = request.args.get('sprint')
+    documento = mdb.db.avaliacoes.find_one({"nomeGrupo": nome_grupo, "sprint": sprint})
+    if documento:
+        documento.pop('_id')
+        return jsonify(documento)
+    else:
+        return "Documento não encontrado", 404
+    
+@app.route('/pacer/numeroDeAlunos', methods=['GET'])
+def numero_de_alunos():
+    nome_grupo = request.args.get('nome')
+    grupo = mdb.db.grupos.find_one({'nome': nome_grupo})
+    alunos = list(filter(lambda x: x != '', grupo['alunos']))
+    return jsonify({'numero_de_alunos': len(alunos)})
