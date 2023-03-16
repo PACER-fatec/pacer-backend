@@ -7,6 +7,7 @@ from flask_cors import CORS
 import os
 import json
 import csv
+import math
 
 import mdb_connection as mdb
 import importDb as imdb
@@ -29,19 +30,55 @@ RES_DIR = BASE_DIR + '\\pacer_fatec\\resources'
 def hello():
     return "PACER SERVER WORKING! (v1.10)"
 
-@app.route("/pacer", methods = ['POST'])
-def enviarAvaliacao ():
-    requestList = request.form
-    requestList = requestList.to_dict()
+@app.route("/pacer", methods=['POST'])
+def enviarAvaliacao():
+    request_data = request.form.to_dict()
+    nome_grupo = request_data['nomeGrupo']
+    sprint = request_data['sprint']
+    if request_data['pontos_disponiveis'] == 'null':
+        return "Erro: aguarde a avaliação da sprint pelo professor."
+    else:
+        pontos_disponiveis = int(request_data['pontos_disponiveis'])
 
-    requestList['data-avaliacao'] = str(datetime.now().strftime('%d/%m/%y %H:%M'))
+    grupoSelecionado = mdb.db.grupos.find_one({'nome': request_data['grupoSelecionado']})
+    alunosGrupoSelecionado = grupoSelecionado['alunos']
 
-    avaliador = mdb.db.users.find_one({'email': requestList['avaliador']})
-    avaliado = mdb.db.users.find_one({'email': requestList['avaliado']})
-    requestList['avaliador'] = avaliador['nome']
-    requestList['avaliado'] = avaliado['nome']
+    # filtrar apenas os alunos válidos (com e-mails válidos)
+    alunos_validos = [aluno for aluno in alunosGrupoSelecionado if aluno and "@" in aluno and "." in aluno.split("@")[-1]]
+    num_alunos_validos = len(alunos_validos)
+    print("numero de alunos: " + str(num_alunos_validos))
 
-    fullJson = json.loads(json.dumps(requestList))
+    # verificar se há alunos válidos antes de calcular a média
+    if num_alunos_validos > 0:
+
+        # buscar as avaliações dos alunos válidos
+        avaliacoes_aluno = mdb.db.avaliacoes.find_one({'nomeGrupo': nome_grupo, 'sprint': sprint})
+        pontos_totais = int(avaliacoes_aluno["pontos"])
+
+        # calcular a média de pontos por aluno válido
+        data = json.loads(str(json.dumps(request.form)))
+        keys = list(data.keys())
+        valores = [data[keys[i]] for i in range(3,8)]
+        pontos_gastos_pelo_aluno = sum(map(int, valores))
+        print(pontos_gastos_pelo_aluno)
+
+        # verificar se a quantidade de pontos excede o máximo permitido
+        if pontos_disponiveis < pontos_gastos_pelo_aluno:
+            return 'Erro: quantidade máxima de pontos excedida para este aluno.'
+    else:
+        return 'Erro: nenhum aluno válido encontrado no grupo.'
+
+
+    request_data['data-avaliacao'] = str(datetime.now().strftime('%d/%m/%y %H:%M'))
+
+    avaliador = mdb.db.users.find_one({'email': request_data['avaliador']})
+    avaliado = mdb.db.users.find_one({'email': request_data['avaliado']})
+    request_data['avaliador'] = avaliador['nome']
+    request_data['avaliado'] = avaliado['nome']
+
+    request_data.pop('grupoSelecionado')
+
+    fullJson = json.loads(json.dumps(request_data))
     mensagem = ''
     if aluno_pode_avaliar(fullJson):
         mdb.db.fatec.insert_one(fullJson)

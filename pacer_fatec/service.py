@@ -2,7 +2,10 @@ import mdb_connection as mdb
 import json
 
 def sprints():
-    return mdb.db.fatec.distinct('sprint')
+    if mdb.db.fatec.distinct('sprint') == []:
+        return ["1"]
+    else:
+        return mdb.db.fatec.distinct('sprint')
 
 def alunosGrafico():
     alunos = []
