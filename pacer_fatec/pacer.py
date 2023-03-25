@@ -267,8 +267,12 @@ def grupoSelecionado():
     # Para cada aluno, encontre as informações do usuário e adicione à lista de resultados
     for aluno in alunos:
         if aluno:
+            print(aluno)
             usuario = mdb.db.users.find_one({'email': aluno}, {'_id': False, 'nome': True, 'email': True})
+            
             resultado.append(usuario)
+
+    print(resultado)
 
     # Retorne o nome do grupo, as habilidades e a lista de resultados
     return jsonify({'nome': nomeGrupo, 'skills': habilidades, 'alunos': resultado})
