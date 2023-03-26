@@ -362,6 +362,7 @@ def cadastrar_avaliacao():
     sprint = data.get('avaliacao').get('sprint')
     nota = data.get('avaliacao').get('nota')
     pontos = data.get('avaliacao').get('pontos')
+    nextSprint = int(sprint) + 1
 
     # Verifica se já existe um registro para o mesmo nome de grupo e sprint
     if mdb.db.avaliacoes.find_one({"nomeGrupo": nome_grupo, "sprint": sprint}):

@@ -1,11 +1,11 @@
+import pymongo
 import mdb_connection as mdb
 import json
 
 def sprints():
-    if mdb.db.fatec.distinct('sprint') == []:
-        return ["1"]
-    else:
-        return mdb.db.fatec.distinct('sprint')
+    ultimo_sprint = mdb.db.avaliacoes.find_one(sort=[('sprint', pymongo.DESCENDING)])
+    num_sprints = int(ultimo_sprint['sprint']) + 1 if ultimo_sprint else 1
+    return list(range(1, num_sprints+1))
 
 def alunosGrafico():
     alunos = []
