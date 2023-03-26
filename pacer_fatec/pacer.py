@@ -4,6 +4,7 @@ from xml.dom.minidom import Document
 from flask import Flask, request, jsonify, send_file, request
 from datetime import datetime
 from flask_cors import CORS
+from flask import jsonify
 import os
 import json
 import csv
@@ -199,16 +200,53 @@ def novasenha ():
 def numeroDeSprints():
     return json.dumps(sprints())
 
-@app.route('/pacer/media', methods = ['POST'])
-def mediaAluno ():
+@app.route('/pacer/media', methods=['POST'])
+def mediaAluno():
     requestDict = request.form.to_dict()
+    avaliacoes_aluno = list(mdb.db.fatec.find({"avaliado": requestDict['nome'], "sprint": requestDict['sprint'], "nomeGrupo": requestDict['grupo']}))
 
-    avaliacoes = list(mdb.db.fatec.find({"avaliado": requestDict['nome'], "sprint": requestDict['sprint']}, {"_id": 0,"avaliado": 1, "proatividade": 1, "autonomia": 1, "colaboracao": 1, "entrega-resultados": 1}))
+    if not avaliacoes_aluno:
+        return 'Nenhuma avaliação encontrada para esses parâmetros.'
 
-    grupoAlunosList = grupoAluno(requestDict)
-    mediaAlunoList = mediaAlunos(avaliacoes)
+    # Obtém as habilidades e suas posições no dicionário de avaliações
+    habilidades = list(avaliacoes_aluno[0].keys())[4:9]  # Supondo que as habilidades começam na quinta posição
 
-    return json.dumps({'aluno': mediaAlunoList, 'grupo': grupoAlunosList})
+    # Cria o dicionário de média do aluno dinamicamente usando as habilidades
+    media_aluno = {habilidade: 0 for habilidade in habilidades}
+
+    for avaliacao in avaliacoes_aluno:
+        for habilidade in habilidades:
+            media_aluno[habilidade] += int(avaliacao[habilidade])
+
+    num_avaliacoes_aluno = len(avaliacoes_aluno)
+    for habilidade in habilidades:
+        media_aluno[habilidade] /= num_avaliacoes_aluno
+        media_aluno[habilidade] = round(media_aluno[habilidade], 2)
+
+    # Obtém a média do grupo para a mesma sprint e habilidades
+    avaliacoes_grupo = list(mdb.db.fatec.find({"sprint": requestDict['sprint'], "nomeGrupo": requestDict['grupo']}))
+    num_avaliacoes_grupo = len(avaliacoes_grupo)
+
+    # Cria o dicionário de média do grupo dinamicamente usando as habilidades
+    media_grupo = {habilidade: 0 for habilidade in habilidades}
+
+    for avaliacao in avaliacoes_grupo:
+        for habilidade in habilidades:
+            media_grupo[habilidade] += int(avaliacao[habilidade])
+
+    for habilidade in habilidades:
+        media_grupo[habilidade] /= num_avaliacoes_grupo
+        media_grupo[habilidade] = round(media_grupo[habilidade], 2)
+
+    # Cria o dicionário com as informações de média do aluno e média do grupo
+    resultado = {
+        'media_aluno': media_aluno,
+        'media_grupo': media_grupo,
+        'num_avaliacoes_aluno': num_avaliacoes_aluno,
+        'num_avaliacoes_grupo': num_avaliacoes_grupo
+    }
+
+    return jsonify(resultado)
 
 @app.route('/pacer/cadastrarGrupo', methods = ['POST'])
 def cadastrarGrupo():

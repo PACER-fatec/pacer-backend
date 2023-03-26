@@ -27,8 +27,18 @@ def mediaAlunos(avaliacoes):
 
 
 def grupoAluno(requestDict):
-    grupoAlunoSelecionado = mdb.db.alunos.find_one({'nome': requestDict['nome']}, {'grupo': 1, '_id': 0})
-    alunosGrupoSelecionado = list(mdb.db.alunos.find({'grupo': grupoAlunoSelecionado['grupo']}, {'nome': 1, '_id': 0}))
+    grupoAlunoSelecionado = requestDict['grupo']
+    alunosGrupoSelecionado = list(mdb.db.grupos.find({'nome': grupoAlunoSelecionado}, {'alunos': 1, '_id': 0}))[0]
+    alunosGrupoSelecionado = [aluno for aluno in alunosGrupoSelecionado['alunos'] if '@' in aluno]
+
+    nomes = []
+    for email in alunosGrupoSelecionado:
+        user = mdb.db.users.find_one({'email': email})
+        nomes.append(user['nome'])
+
+    alunosGrupoSelecionado = nomes
+
+    print(alunosGrupoSelecionado)
 
     mediaGrupo = []
     proatividadeList = []
@@ -43,6 +53,6 @@ def grupoAluno(requestDict):
             autonomiaList.append(int(avaliacao['autonomia']))
             colaboracaoList.append(int(avaliacao['colaboracao']))
             entregaResultadoList.append(int(avaliacao['entrega-resultados']))
-    
+
     return [round(sum(proatividadeList)/len(proatividadeList), 2), round(sum(autonomiaList)/len(autonomiaList), 2),
     round(sum(colaboracaoList)/len(colaboracaoList), 2), round(sum(entregaResultadoList)/len(entregaResultadoList), 2)]
