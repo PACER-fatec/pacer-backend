@@ -137,35 +137,23 @@ def uploadAlunos ():
     return ('', 204)
 
 @app.route('/pacer/csvfile')
-def relatorio ():
+def relatorio():
     relatorio = mdb.db.fatec.find()
     response = []
+
     for doc in relatorio:
         del doc['_id']
         response.append(doc)
 
-    jsonToCsv = json.dumps(response)
-    jsonToCsv = json.loads(jsonToCsv)
+    filename = f"{RES_DIR}/relatorio.txt"
 
-    file = open(f"{RES_DIR}//relatorio.csv", "w", newline='', encoding='utf-8')
-    f = csv.writer(file)
+    with open(filename, "w", encoding='utf-8') as file:
+        for doc in response:
+            for key, value in doc.items():
+                file.write(f"{key}: {value}\n")
+            file.write("\n")
 
-    f.writerow(["sprint", "avaliador", "avaliado", "proatividade", "autonomia",
-                "colaboracao", "entrega-resultados", "data-avaliacao"])
-
-    for linha in jsonToCsv:        
-        f.writerow([linha["sprint"],
-                    linha["avaliador"],
-                    linha["avaliado"],
-                    linha["proatividade"],
-                    linha["autonomia"],
-                    linha["colaboracao"],
-                    linha["entrega-resultados"],
-                    linha["data-avaliacao"]])
-
-    file.close()
-
-    return send_file(f'{RES_DIR}//relatorio.csv')
+    return send_file(filename)
 
 @app.route('/pacer/login', methods = ['POST'])
 def login ():
