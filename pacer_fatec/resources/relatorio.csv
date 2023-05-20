@@ -1,0 +1,9 @@
+sprint,avaliador,avaliado,Analítico,Contexto,Futurista,Ideativo,Input,nomeGrupo,pontos_disponiveis,data-avaliacao
+1,alunoTeste,Andre Pires,3,3,3,3,3,teste,15,26/03/23 01:40
+1,alunoTeste,Wesley Vinicius,3,3,3,3,3,teste,15,26/03/23 01:41
+1,alunoTeste,ADMIN,3,3,3,3,3,teste,15,26/03/23 01:41
+1,Andre Pires,alunoTeste,3,3,3,3,3,teste,15,26/03/23 01:43
+1,Wesley Vinicius,alunoTeste,3,3,3,3,3,teste,15,26/03/23 01:43
+1,ADMIN,alunoTeste,3,3,3,3,3,teste,15,26/03/23 01:44
+2,alunoTeste,Andre Pires,2,1,3,2,1,teste,11,26/03/23 01:44
+2,alunoTeste,Wesley Vinicius,3,3,3,1,1,teste,11,26/03/23 01:45
