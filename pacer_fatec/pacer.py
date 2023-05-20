@@ -155,6 +155,34 @@ def relatorio():
 
     return send_file(filename)
 
+@app.route('/pacer/csvfileFiltered')
+def relatorioFiltrado():
+    nome_grupo = request.args.get('nomeGrupo')
+    sprint = request.args.get('sprint')
+
+    query = {}
+    if nome_grupo:
+        query['nomeGrupo'] = nome_grupo
+    if sprint:
+        query['sprint'] = sprint
+
+    relatorio = mdb.db.fatec.find(query)
+    response = []
+
+    for doc in relatorio:
+        del doc['_id']
+        response.append(doc)
+
+    filename = f"{RES_DIR}/relatorio.txt"
+
+    with open(filename, "w", encoding='utf-8') as file:
+        for doc in response:
+            for key, value in doc.items():
+                file.write(f"{key}: {value}\n")
+            file.write("\n")
+
+    return send_file(filename)
+
 @app.route('/pacer/login', methods = ['POST'])
 def login ():
     requestDict = request.form.to_dict()
