@@ -59,6 +59,7 @@ def enviarAvaliacao():
         # calcular a média de pontos por aluno válido
         data = json.loads(str(json.dumps(request.form)))
         keys = list(data.keys())
+        print (keys)
         valores = [data[keys[i]] for i in range(3,8)]
         pontos_gastos_pelo_aluno = sum(map(int, valores))
         print(pontos_gastos_pelo_aluno)
@@ -214,7 +215,10 @@ def novasenha ():
 
 @app.route('/pacer/sprints')
 def numeroDeSprints():
-    return json.dumps(sprints())
+    grupo = request.args.get('grupo')
+    sprints_list = sprints(grupo)  # Obter a lista de sprints
+    return json.dumps(sprints_list)  # Retornar a lista como JSON
+
 
 @app.route('/pacer/media', methods=['POST'])
 def mediaAluno():

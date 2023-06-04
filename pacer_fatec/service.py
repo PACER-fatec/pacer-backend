@@ -2,10 +2,15 @@ import pymongo
 import mdb_connection as mdb
 import json
 
-def sprints():
-    ultimo_sprint = mdb.db.avaliacoes.find_one(sort=[('sprint', pymongo.DESCENDING)])
+def sprints(grupo):
+    filtro = {}  # Filtro padrão
+    if grupo:
+        filtro['nomeGrupo'] = grupo  # Adiciona o filtro de grupo, se fornecido
+    
+    ultimo_sprint = mdb.db.avaliacoes.find_one(filtro, sort=[('sprint', pymongo.DESCENDING)])
     num_sprints = int(ultimo_sprint['sprint']) + 1 if ultimo_sprint else 1
-    return list(range(1, num_sprints+1))
+    return list(range(1, num_sprints + 1))
+
 
 def alunosGrafico():
     alunos = []
