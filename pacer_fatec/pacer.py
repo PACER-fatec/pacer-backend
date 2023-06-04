@@ -268,20 +268,28 @@ def mediaAluno():
 
     return jsonify(resultado)
 
-@app.route('/pacer/cadastrarGrupo', methods = ['POST'])
+@app.route('/pacer/cadastrarGrupo', methods=['PUT'])
 def cadastrarGrupo():
     requestList = request.data
-
     fullJson = json.loads(requestList)
 
-    erroAluno = existe_alunos(fullJson['alunos'])
-    erroGrupo = existe_grupo(fullJson['nome'])
+    # Verificar se existem skills duplicadas
+    skills = fullJson['skills']
+    if len(set(skills)) != len(skills):
+        return "Não é possível criar ou atualizar o grupo com skills duplicadas."
 
-    if not erroAluno and not erroGrupo:
+    grupoExistente = mdb.db.grupos.find_one({'nome': fullJson['nome']})
+
+    if grupoExistente:
+        for key, value in fullJson.items():
+            if key != 'nome' and grupoExistente.get(key) != value:
+                grupoExistente[key] = value
+        mdb.db.grupos.replace_one({'_id': grupoExistente['_id']}, grupoExistente)
+        return "Grupo atualizado com sucesso!"
+    else:
         mdb.db.grupos.insert_one(fullJson)
         return "Grupo criado com sucesso!"
-    else:
-        return str(erroAluno) + '<br>' + str(erroGrupo)
+
 
 @app.route('/pacer/gruposAlunoLogado')
 def grupoAlunoLogado():
