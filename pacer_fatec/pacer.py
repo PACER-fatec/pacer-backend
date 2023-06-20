@@ -420,3 +420,31 @@ def numero_de_alunos():
     grupo = mdb.db.grupos.find_one({'nome': nome_grupo})
     alunos = list(filter(lambda x: x != '', grupo['alunos']))
     return jsonify({'numero_de_alunos': len(alunos)})
+
+@app.route('/pacer/cadastroSkills', methods=['POST'])
+def adicionar_skill():
+    # Obtenha os dados enviados na solicitação
+    nova_skill = request.json
+    nome_skill = list(nova_skill['Skills'][0].keys())[0]  # Obtém o nome da skill
+
+    # Verifique se a skill já existe na coleção "Skills"
+    skill_existente = mdb.db.skills.find_one({'Topico': nova_skill['Topico']})
+
+    if skill_existente:
+        # Atualize o documento existente na coleção "Skills"
+        existing_skills = skill_existente['Skills']
+        for skill in existing_skills:
+            if nome_skill in skill:
+                return {'message': 'Skill já existente'}
+
+        skill = {nome_skill: nova_skill['Skills'][0][nome_skill]}
+        existing_skills.append(skill)
+        mdb.db.skills.update_one(
+            {'Topico': nova_skill['Topico']},
+            {'$set': {'Skills': existing_skills}}
+        )
+        return {'message': 'Skill adicionada com sucesso'}
+    else:
+        # Crie um novo documento na coleção "Skills"
+        mdb.db.skills.insert_one(nova_skill)
+        return {'message': 'Skill adicionada com sucesso'}

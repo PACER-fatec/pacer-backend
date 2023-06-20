@@ -1,0 +1,24 @@
+sprint: 2
+avaliador: Wesley Vinicius
+avaliado: Wesley Vinicius
+Analítico: 2
+Desenvolvimento: 2
+Intelecção: 2
+Relacionamento: 2
+Comando: 0
+nomeGrupo: testeSakaue
+pontos_disponiveis: 8
+data-avaliacao: 15/06/23 16:49
+
+sprint: 2
+avaliador: Wesley Vinicius
+avaliado: Andre Pires
+Analítico: 1
+Desenvolvimento: 1
+Intelecção: 2
+Relacionamento: 1
+Comando: 1
+nomeGrupo: testeSakaue
+pontos_disponiveis: 8
+data-avaliacao: 15/06/23 16:49
+
