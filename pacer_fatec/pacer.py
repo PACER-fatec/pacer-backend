@@ -388,7 +388,7 @@ def cadastrar_avaliacao():
     data = request.json
     nome_grupo = data.get('nomeGrupo')
     sprint = data.get('avaliacao').get('sprint')
-    nota = data.get('avaliacao').get('nota')
+    situacao = data.get('avaliacao').get('situacao')
     pontos = data.get('avaliacao').get('pontos')
     nextSprint = int(sprint) + 1
 
@@ -398,7 +398,7 @@ def cadastrar_avaliacao():
 
     # Insere a nova avaliação
     try:
-        mdb.db.avaliacoes.insert_one({"nomeGrupo": nome_grupo, "sprint": sprint, "nota": nota, "pontos": pontos})
+        mdb.db.avaliacoes.insert_one({"nomeGrupo": nome_grupo, "sprint": sprint, "situacao": situacao, "pontos": pontos})
         return jsonify({"message": "Avaliação cadastrada com sucesso."}), 201
     except:
         return jsonify({"message": "Erro interno. Não foi possível realizar a operação."}), 500
