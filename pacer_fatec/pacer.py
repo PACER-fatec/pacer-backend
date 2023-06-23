@@ -33,15 +33,17 @@ def hello():
 
 @app.route("/pacer", methods=['POST'])
 def enviarAvaliacao():
-    request_data = request.form.to_dict()
+    request_data = json.loads(request.data)
+
     nome_grupo = request_data['nomeGrupo']
     sprint = request_data['sprint']
-    if request_data['pontos_disponiveis'] == 'null':
+
+    if request_data['pontos_disponiveis'] == '':
         return "Erro: aguarde a avaliação da sprint pelo professor."
     else:
         pontos_disponiveis = int(request_data['pontos_disponiveis'])
 
-    grupoSelecionado = mdb.db.grupos.find_one({'nome': request_data['grupoSelecionado']})
+    grupoSelecionado = mdb.db.grupos.find_one({'nome': request_data['nomeGrupo']})
     alunosGrupoSelecionado = grupoSelecionado['alunos']
 
     # filtrar apenas os alunos válidos (com e-mails válidos)
@@ -52,33 +54,26 @@ def enviarAvaliacao():
     # verificar se há alunos válidos antes de calcular a média
     if num_alunos_validos > 0:
 
-        # buscar as avaliações dos alunos válidos
-        avaliacoes_aluno = mdb.db.avaliacoes.find_one({'nomeGrupo': nome_grupo, 'sprint': sprint})
-        pontos_totais = int(avaliacoes_aluno["pontos"])
-
-        # calcular a média de pontos por aluno válido
-        data = json.loads(str(json.dumps(request.form)))
-        keys = list(data.keys())
-        print (keys)
-        valores = [data[keys[i]] for i in range(3,8)]
-        pontos_gastos_pelo_aluno = sum(map(int, valores))
-        print(pontos_gastos_pelo_aluno)
+        # calcular a soma total de pontos para cada avaliado
+        pontos_gastos_totais = 0
+        for avaliacao in request_data['avaliacoes']:
+            pontos_gastos_pelo_aluno = sum(int(valor) for habilidade, valor in avaliacao.items() if habilidade != 'avaliado')
+            pontos_gastos_totais += pontos_gastos_pelo_aluno
 
         # verificar se a quantidade de pontos excede o máximo permitido
-        if pontos_disponiveis < pontos_gastos_pelo_aluno:
+        if pontos_gastos_totais > pontos_disponiveis:
             return 'Erro: quantidade máxima de pontos excedida para este aluno.'
     else:
         return 'Erro: nenhum aluno válido encontrado no grupo.'
 
-
     request_data['data-avaliacao'] = str(datetime.now().strftime('%d/%m/%y %H:%M'))
 
     avaliador = mdb.db.users.find_one({'email': request_data['avaliador']})
-    avaliado = mdb.db.users.find_one({'email': request_data['avaliado']})
-    request_data['avaliador'] = avaliador['nome']
-    request_data['avaliado'] = avaliado['nome']
 
-    request_data.pop('grupoSelecionado')
+    for avaliacao in request_data['avaliacoes']:
+        avaliado = mdb.db.users.find_one({'email': avaliacao['avaliado']})
+        avaliacao['avaliador'] = avaliador['nome']
+        avaliacao['avaliado'] = avaliado['nome']
 
     fullJson = json.loads(json.dumps(request_data))
     mensagem = ''
@@ -86,7 +81,7 @@ def enviarAvaliacao():
         mdb.db.fatec.insert_one(fullJson)
         mensagem = "Avaliação enviada! Obrigado."
     else:
-        mensagem = "Este avaliador não pode avaliar a mesma pessoa mais de uma vez."
+        mensagem = "Este avaliador não pode criar uma avaliação que já existe."
     return mensagem
 
 @app.route('/pacer/cadastro', methods = ['POST'])
@@ -410,6 +405,7 @@ def obter_pontos():
     documento = mdb.db.avaliacoes.find_one({"nomeGrupo": nome_grupo, "sprint": sprint})
     if documento:
         documento.pop('_id')
+        print(documento)
         return jsonify(documento)
     else:
         return "Documento não encontrado", 404
