@@ -218,46 +218,44 @@ def numeroDeSprints():
 @app.route('/pacer/media', methods=['POST'])
 def mediaAluno():
     requestDict = request.form.to_dict()
-    avaliacoes_aluno = list(mdb.db.fatec.find({"avaliado": requestDict['nome'], "sprint": requestDict['sprint'], "nomeGrupo": requestDict['grupo']}))
+    avaliacoes_aluno = list(mdb.db.fatec.find({
+        "avaliacoes.avaliado": requestDict['nome'],
+        "sprint": requestDict['sprint'],
+        "nomeGrupo": requestDict['grupo']
+    }))
 
     if not avaliacoes_aluno:
         return 'Nenhuma avaliação encontrada para esses parâmetros.'
 
-    # Obtém as habilidades e suas posições no dicionário de avaliações
-    habilidades = list(avaliacoes_aluno[0].keys())[4:9]  # Supondo que as habilidades começam na quinta posição
+    habilidades = list(avaliacoes_aluno[0]['avaliacoes'][0].keys())[1:-1]  # Supondo que as habilidades estão nas posições 1 a -1
 
-    # Cria o dicionário de média do aluno dinamicamente usando as habilidades
     media_aluno = {habilidade: 0 for habilidade in habilidades}
+    num_avaliacoes_aluno = 0
+    medias_grupo = {habilidade: 0 for habilidade in habilidades}
+    num_avaliacoes_grupo = 0
 
     for avaliacao in avaliacoes_aluno:
-        for habilidade in habilidades:
-            media_aluno[habilidade] += int(avaliacao[habilidade])
+        for item in avaliacao['avaliacoes']:
+            if item['avaliado'] == requestDict['nome']:
+                for habilidade in habilidades:
+                    media_aluno[habilidade] += int(item[habilidade])
+                num_avaliacoes_aluno += 1
 
-    num_avaliacoes_aluno = len(avaliacoes_aluno)
+            for habilidade in habilidades:
+                medias_grupo[habilidade] += int(item[habilidade])
+            num_avaliacoes_grupo += 1
+
     for habilidade in habilidades:
         media_aluno[habilidade] /= num_avaliacoes_aluno
         media_aluno[habilidade] = round(media_aluno[habilidade], 2)
 
-    # Obtém a média do grupo para a mesma sprint e habilidades
-    avaliacoes_grupo = list(mdb.db.fatec.find({"sprint": requestDict['sprint'], "nomeGrupo": requestDict['grupo']}))
-    num_avaliacoes_grupo = len(avaliacoes_grupo)
+        medias_grupo[habilidade] /= num_avaliacoes_grupo
+        medias_grupo[habilidade] = round(medias_grupo[habilidade], 2)
 
-    # Cria o dicionário de média do grupo dinamicamente usando as habilidades
-    media_grupo = {habilidade: 0 for habilidade in habilidades}
-
-    for avaliacao in avaliacoes_grupo:
-        for habilidade in habilidades:
-            media_grupo[habilidade] += int(avaliacao[habilidade])
-
-    for habilidade in habilidades:
-        media_grupo[habilidade] /= num_avaliacoes_grupo
-        media_grupo[habilidade] = round(media_grupo[habilidade], 2)
-
-    # Cria o dicionário com as informações de média do aluno e média do grupo
     resultado = {
         'media_aluno': media_aluno,
-        'media_grupo': media_grupo,
         'num_avaliacoes_aluno': num_avaliacoes_aluno,
+        'media_grupo': medias_grupo,
         'num_avaliacoes_grupo': num_avaliacoes_grupo
     }
 
